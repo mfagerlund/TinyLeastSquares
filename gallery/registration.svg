@@ -1,0 +1,71 @@
+<svg viewBox="0 0 301 198" stroke="DarkGoldenRod" stroke-width="1" fill="transparent" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="301mm" height="198mm" >
+  <title>TinyLeastSquares - rigid registration</title>
+  <rect fill="#0b1020" stroke-width="0" x="0" y="0" width="300" height="190"/>
+  <path stroke="#334155" stroke-width="2" stroke-dasharray="4 3" d="M173.52054 97.0211 L213.66179 124.94901"/>
+  <path stroke="#334155" stroke-width="2" stroke-dasharray="4 3" d="M213.66179 124.94901 L228.58447 104.955635"/>
+  <path stroke="#334155" stroke-width="2" stroke-dasharray="4 3" d="M228.58447 104.955635 L221.25085 78.79749"/>
+  <path stroke="#334155" stroke-width="2" stroke-dasharray="4 3" d="M221.25085 78.79749 L190.60129 75.22947"/>
+  <path stroke="#334155" stroke-width="2" stroke-dasharray="4 3" d="M190.60129 75.22947 L173.52054 97.0211"/>
+  <circle  fill="#94a3b8" stroke-width="0" cx="173.52054" cy="97.0211" r="2.6" />
+  <circle  fill="#94a3b8" stroke-width="0" cx="213.66179" cy="124.94901" r="2.6" />
+  <circle  fill="#94a3b8" stroke-width="0" cx="228.58447" cy="104.955635" r="2.6" />
+  <circle  fill="#94a3b8" stroke-width="0" cx="221.25085" cy="78.79749" r="2.6" />
+  <circle  fill="#94a3b8" stroke-width="0" cx="190.60129" cy="75.22947" r="2.6" />
+  <path stroke="#38bdf8" stroke-width="3" stroke-linecap="round" id="0f3b23" d="M62 124 L110 124"/>
+  <animate repeatCount="indefinite" dur="6s" xlink:href="#0f3b23" fill="freeze" attributeName="d"
+    values="M62,124 L110,124;M172.31242,98.88049 L211.90558,126.016846;M174.50255,97.01573 L212.47452,126.37778;M174.54657,96.982765 L212.48819,126.384;M174.54744,96.9822 L212.48854,126.38412;M174.54744,96.9822 L212.48854,126.38412;M174.54744,96.9822 L212.48854,126.38412;M174.54657,96.982765 L212.48819,126.384;M174.50255,97.01573 L212.47452,126.37778;M172.31242,98.88049 L211.90558,126.016846;M62,124 L110,124" 
+ />
+  <path stroke="#38bdf8" stroke-width="3" stroke-linecap="round" id="c68f48" d="M110 124 L110 98"/>
+  <animate repeatCount="indefinite" dur="6s" xlink:href="#c68f48" fill="freeze" attributeName="d"
+    values="M110,124 L110,98;M211.90558,126.016846 L226.60445,104.57055;M212.47452,126.37778 L228.37895,105.80962;M212.48819,126.384 L228.41386,105.83229;M212.48854,126.38412 L228.41458,105.83269;M212.48854,126.38412 L228.41458,105.83269;M212.48854,126.38412 L228.41458,105.83269;M212.48819,126.384 L228.41386,105.83229;M212.47452,126.37778 L228.37895,105.80962;M211.90558,126.016846 L226.60445,104.57055;M110,124 L110,98" 
+ />
+  <path stroke="#38bdf8" stroke-width="3" stroke-linecap="round" id="82eb82" d="M110 98 L86 78"/>
+  <animate repeatCount="indefinite" dur="6s" xlink:href="#82eb82" fill="freeze" attributeName="d"
+    values="M110,98 L86,78;M226.60445,104.57055 L218.11467,74.50522;M228.37895,105.80962 L221.62715,75.306946;M228.41386,105.83229 L221.69357,75.32266;M228.41458,105.83269 L221.69482,75.32294;M228.41458,105.83269 L221.69482,75.32294;M228.41458,105.83269 L221.69482,75.32294;M228.41386,105.83229 L221.69357,75.32266;M228.37895,105.80962 L221.62715,75.306946;M226.60445,104.57055 L218.11467,74.50522;M110,98 L86,78" 
+ />
+  <path stroke="#38bdf8" stroke-width="3" stroke-linecap="round" id="526111" d="M86 78 L62 98"/>
+  <animate repeatCount="indefinite" dur="6s" xlink:href="#526111" fill="freeze" attributeName="d"
+    values="M86,78 L62,98;M218.11467,74.50522 L187.01128,77.4342;M221.62715,75.306946 L190.40698,76.447586;M221.69357,75.32266 L190.47224,76.43105;M221.69482,75.32294 L190.47348,76.43077;M221.69482,75.32294 L190.47348,76.43077;M221.69482,75.32294 L190.47348,76.43077;M221.69357,75.32266 L190.47224,76.43105;M221.62715,75.306946 L190.40698,76.447586;M218.11467,74.50522 L187.01128,77.4342;M86,78 L62,98" 
+ />
+  <path stroke="#38bdf8" stroke-width="3" stroke-linecap="round" id="10de9d" d="M62 98 L62 124"/>
+  <animate repeatCount="indefinite" dur="6s" xlink:href="#10de9d" fill="freeze" attributeName="d"
+    values="M62,98 L62,124;M187.01128,77.4342 L172.31242,98.88049;M190.40698,76.447586 L174.50255,97.01573;M190.47224,76.43105 L174.54657,96.982765;M190.47348,76.43077 L174.54744,96.9822;M190.47348,76.43077 L174.54744,96.9822;M190.47348,76.43077 L174.54744,96.9822;M190.47224,76.43105 L174.54657,96.982765;M190.40698,76.447586 L174.50255,97.01573;M187.01128,77.4342 L172.31242,98.88049;M62,98 L62,124" 
+ />
+  <circle  fill="#34d399" stroke-width="0" id="558961" cx="62" cy="124" r="3" />
+  <animate repeatCount="indefinite" dur="6s" xlink:href="#558961" fill="freeze" attributeName="cx"
+    values="62;172.31242;174.50255;174.54657;174.54744;174.54744;174.54744;174.54657;174.50255;172.31242;62" 
+ />
+  <animate repeatCount="indefinite" dur="6s" xlink:href="#558961" fill="freeze" attributeName="cy"
+    values="124;98.88049;97.01573;96.982765;96.9822;96.9822;96.9822;96.982765;97.01573;98.88049;124" 
+ />
+  <circle  fill="#34d399" stroke-width="0" id="3fcbf4" cx="110" cy="124" r="3" />
+  <animate repeatCount="indefinite" dur="6s" xlink:href="#3fcbf4" fill="freeze" attributeName="cx"
+    values="110;211.90558;212.47452;212.48819;212.48854;212.48854;212.48854;212.48819;212.47452;211.90558;110" 
+ />
+  <animate repeatCount="indefinite" dur="6s" xlink:href="#3fcbf4" fill="freeze" attributeName="cy"
+    values="124;126.016846;126.37778;126.384;126.38412;126.38412;126.38412;126.384;126.37778;126.016846;124" 
+ />
+  <circle  fill="#34d399" stroke-width="0" id="5d48e6" cx="110" cy="98" r="3" />
+  <animate repeatCount="indefinite" dur="6s" xlink:href="#5d48e6" fill="freeze" attributeName="cx"
+    values="110;226.60445;228.37895;228.41386;228.41458;228.41458;228.41458;228.41386;228.37895;226.60445;110" 
+ />
+  <animate repeatCount="indefinite" dur="6s" xlink:href="#5d48e6" fill="freeze" attributeName="cy"
+    values="98;104.57055;105.80962;105.83229;105.83269;105.83269;105.83269;105.83229;105.80962;104.57055;98" 
+ />
+  <circle  fill="#34d399" stroke-width="0" id="4b8ab4" cx="86" cy="78" r="3" />
+  <animate repeatCount="indefinite" dur="6s" xlink:href="#4b8ab4" fill="freeze" attributeName="cx"
+    values="86;218.11467;221.62715;221.69357;221.69482;221.69482;221.69482;221.69357;221.62715;218.11467;86" 
+ />
+  <animate repeatCount="indefinite" dur="6s" xlink:href="#4b8ab4" fill="freeze" attributeName="cy"
+    values="78;74.50522;75.306946;75.32266;75.32294;75.32294;75.32294;75.32266;75.306946;74.50522;78" 
+ />
+  <circle  fill="#34d399" stroke-width="0" id="784cee" cx="62" cy="98" r="3" />
+  <animate repeatCount="indefinite" dur="6s" xlink:href="#784cee" fill="freeze" attributeName="cx"
+    values="62;187.01128;190.40698;190.47224;190.47348;190.47348;190.47348;190.47224;190.40698;187.01128;62" 
+ />
+  <animate repeatCount="indefinite" dur="6s" xlink:href="#784cee" fill="freeze" attributeName="cy"
+    values="98;77.4342;76.447586;76.43105;76.43077;76.43077;76.43077;76.43105;76.447586;77.4342;98" 
+ />
+  <text x="150" y="16" stroke="transparent" paint-order="stroke" text-anchor="middle" dominant-baseline="middle" fill="#e2e8f0" font-size="6.400000095367432" font-family="sans-serif">Rigid registration - solve rotation + translation</text>
+  <text x="150" y="182" stroke="transparent" paint-order="stroke" text-anchor="middle" dominant-baseline="middle" fill="#94a3b8" font-size="5.199999809265137" font-family="sans-serif">3 params (theta, tx, ty), aligning onto the dashed target</text>
+</svg>

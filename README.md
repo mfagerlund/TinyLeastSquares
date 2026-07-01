@@ -12,6 +12,32 @@ derivatives).
 - **net8.0**, nullable-enabled, SIMD-accelerated inner loops.
 - MIT licensed.
 
+## Gallery
+
+Every animation below is a **real solve** — TinyLeastSquares runs the Levenberg-Marquardt solver at
+generation time and the motion is replayed as a self-contained, looping SVG. Open on GitHub to see
+them move; regenerate with `dotnet run --project samples/Demos`.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mfagerlund/TinyLeastSquares/master/gallery/ik-target.svg" width="440" alt="A 4-link IK arm following a moving target"><br>
+  <em>Inverse kinematics — a 4-link arm's tip tracks a moving target; LM is re-solved and
+  warm-started every frame (analytic Jacobian).</em>
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mfagerlund/TinyLeastSquares/master/gallery/curve-fit.svg" width="300" alt="Exponential curve fitting">
+  <img src="https://raw.githubusercontent.com/mfagerlund/TinyLeastSquares/master/gallery/circle-fit.svg" width="300" alt="Circle fitting">
+</p>
+<p align="center">
+  <em>Curve fit <code>y = a·e^(−b·x) + c</code> via a finite-difference Jacobian &middot;
+  geometric circle fit (cx, cy, r).</em>
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mfagerlund/TinyLeastSquares/master/gallery/registration.svg" width="360" alt="Rigid registration aligning a shape onto a target"><br>
+  <em>Rigid registration — solve rotation + translation to align a shape onto a noisy target.</em>
+</p>
+
 ## Install
 
 ```
@@ -69,7 +95,12 @@ NonlinearLeastSquaresSolver.Solve(p, Residuals);                              //
 NonlinearLeastSquaresSolver.Solve(p, Residuals, null, FiniteDifferenceScheme.Central);
 ```
 
-Analytic Jacobians are faster and more accurate — prefer them when available.
+Analytic Jacobians are faster and more accurate — prefer them when available. And you don't have to
+derive one by hand: describe your residual to an LLM and let
+[gradient-script](https://www.npmjs.com/package/gradient-script) (`npm i gradient-script`) do the
+symbolic differentiation for you — it generates ready-to-paste **C#** derivative code (also
+TypeScript / JavaScript / Python) from a small DSL, which you drop straight into your
+`ResidualEvaluation`.
 
 ## Sparse problems
 

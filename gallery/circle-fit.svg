@@ -1,0 +1,41 @@
+<svg viewBox="0 0 281 228" stroke="DarkGoldenRod" stroke-width="1" fill="transparent" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="281mm" height="228mm" >
+  <title>TinyLeastSquares - circle fitting</title>
+  <rect fill="#0b1020" stroke-width="0" x="0" y="0" width="280" height="220"/>
+  <circle  fill="transparent" stroke="#38bdf8" stroke-width="2.5" id="db04d6" cx="108" cy="78" r="24" />
+  <animate repeatCount="indefinite" dur="5s" xlink:href="#db04d6" fill="freeze" attributeName="cx"
+    values="108;150.41893;150.06999;150.96973;150.99484;150.99571;150.99574;150.99576;150.99576;150.99576;150.99574;150.99571;150.99484;150.96973;150.06999;150.41893;108" 
+ />
+  <animate repeatCount="indefinite" dur="5s" xlink:href="#db04d6" fill="freeze" attributeName="cy"
+    values="78;127.81554;112.135826;112.07315;112.06927;112.06911;112.0691;112.0691;112.0691;112.0691;112.0691;112.06911;112.06927;112.07315;112.135826;127.81554;78" 
+ />
+  <animate repeatCount="indefinite" dur="5s" xlink:href="#db04d6" fill="freeze" attributeName="r"
+    values="24;43.549793;57.671696;58.306995;58.307125;58.30686;58.30685;58.30685;58.30685;58.30685;58.30685;58.30686;58.307125;58.306995;57.671696;43.549793;24" 
+ />
+  <circle  fill="#f472b6" stroke-width="0" id="001884" cx="108" cy="78" r="3" />
+  <animate repeatCount="indefinite" dur="5s" xlink:href="#001884" fill="freeze" attributeName="cx"
+    values="108;150.41893;150.06999;150.96973;150.99484;150.99571;150.99574;150.99576;150.99576;150.99576;150.99574;150.99571;150.99484;150.96973;150.06999;150.41893;108" 
+ />
+  <animate repeatCount="indefinite" dur="5s" xlink:href="#001884" fill="freeze" attributeName="cy"
+    values="78;127.81554;112.135826;112.07315;112.06927;112.06911;112.0691;112.0691;112.0691;112.0691;112.0691;112.06911;112.06927;112.07315;112.135826;127.81554;78" 
+ />
+  <circle  fill="#fbbf24" stroke-width="0" cx="104.469246" cy="77.98751" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="111.65899" cy="63.64293" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="126.15407" cy="57.368046" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="141.85707" cy="59.10044" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="156.00027" cy="55.65425" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="171.32709" cy="56.173347" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="181.20366" cy="68.63548" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="198.30367" cy="72.276344" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="205.85797" cy="86.42213" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="210.65623" cy="101.55122" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="207.26656" cy="117.06609" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="208.60727" cy="133.1982" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="197.22238" cy="144.71603" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="185.11195" cy="153.17482" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="176.73714" cy="167.73851" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="160.6816" cy="168.01071" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="145.70691" cy="172.8977" r="2.8" />
+  <circle  fill="#fbbf24" stroke-width="0" cx="131.78152" cy="165.32724" r="2.8" />
+  <text x="140" y="16" stroke="transparent" paint-order="stroke" text-anchor="middle" dominant-baseline="middle" fill="#e2e8f0" font-size="6.400000095367432" font-family="sans-serif">Circle fit:  minimize  S ( |p_i - c| - r )^2</text>
+  <text x="140" y="212" stroke="transparent" paint-order="stroke" text-anchor="middle" dominant-baseline="middle" fill="#94a3b8" font-size="5.199999809265137" font-family="sans-serif">3 params (cx, cy, r), analytic Jacobian</text>
+</svg>
