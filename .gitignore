@@ -1,0 +1,32 @@
+## .NET build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+artifacts/
+*.nupkg
+*.snupkg
+
+## Test results
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coverage.xml
+coverage*.json
+coverage*.xml
+coverage*.info
+
+## IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+## OS
+.DS_Store
+Thumbs.db
