@@ -7,6 +7,27 @@
 - **Finite-difference Jacobians** (forward / central) via residuals-only overloads.
 - L-BFGS unconstrained minimizer.
 
+## Performance
+
+A BenchmarkDotNet harness lives in `benchmarks/Benchmarks` (kept out of the solution so
+release CI never builds it). Run `dotnet run -c Release --project benchmarks/Benchmarks -- --filter '*'`
+for timings, or `... -- diag` for deterministic iteration/eval counts and per-solve allocation.
+
+Done:
+- **JᵀJ / Jᵀr are built once per outer iteration and reused across the inner damping loop**
+  (only λ changes on the diagonal). JᵀJ is built lazily — after the convergence checks — so a
+  converging iteration never pays for it. Wins scale with step rejections: ~-15% allocation and
+  ~-25% time on a rejection-heavy dense fit; flat (no regression) on fast-converging problems.
+
+Next perf levers (surfaced by the benchmark):
+- **Residuals-only trial evaluation.** During damping/line-search trials the solver only needs the
+  residual vector, but the `ResidualFunction` contract forces the caller to build the full Jacobian
+  every call. On expensive-Jacobian problems (e.g. the Gaussian-mixture benchmark) those discarded
+  Jacobians dominate the cost. A residuals-only trial path would help most non-trivial fits.
+- **Sparse symbolic factorization caching.** `SparseCholeskyDirect` redoes AMD ordering + symbolic
+  factorization every iteration though the pattern is fixed; `SparseMatrix.ComputeJtJ` rebuilds and
+  sorts a triplet list every iteration. Caching the pattern / symbolic step is a large sparse win.
+
 ## Deferred / considered
 
 ### Bounds (box) constraints

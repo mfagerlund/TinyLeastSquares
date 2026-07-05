@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <Optimize>true</Optimize>
+    <RootNamespace>TinyLeastSquares.Benchmarks</RootNamespace>
+  </PropertyGroup>
+
+  <!-- Standalone perf harness: deliberately NOT in TinyLeastSquares.sln so it stays out of
+       the package build / release CI (BenchmarkDotNet must never be pulled by a release). -->
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
+    <ProjectReference Include="..\..\src\TinyLeastSquares\TinyLeastSquares.csproj" />
+  </ItemGroup>
+
+</Project>

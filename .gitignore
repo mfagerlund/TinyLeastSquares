@@ -30,3 +30,7 @@ coverage*.info
 ## OS
 .DS_Store
 Thumbs.db
+
+## Benchmarks (generated)
+BenchmarkDotNet.Artifacts/
+*.log

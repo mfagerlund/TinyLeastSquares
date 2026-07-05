@@ -141,11 +141,14 @@ public static partial class NonlinearLeastSquaresSolver
         ResidualFunction residualFn,
         LeastSquaresOptions? options = null)
     {
+        options ??= new LeastSquaresOptions();
+        bool useQR = options.UseQR;
         return SolveCore(
             initialParams,
-            p => { var e = residualFn(p); return (e.Residuals, e.Jacobian); },
-            (jacobian, residuals, lambda) => SolveNormalEquations((double[,])jacobian, residuals, lambda, (options ?? new LeastSquaresOptions()).UseQR),
+            p => { var e = residualFn(p); return (e.Residuals, (object)e.Jacobian); },
             (jacobian, residuals) => LinearSolver.ComputeJtr((double[,])jacobian, residuals),
+            (jacobian, residuals, jtr) => PrepareDenseNormal((double[,])jacobian, residuals, jtr, useQR),
+            SolveDenseNormal,
             null,
             options);
     }
@@ -165,9 +168,10 @@ public static partial class NonlinearLeastSquaresSolver
     {
         return SolveCore(
             initialParams,
-            p => { var e = residualFn(p); return (e.Residuals, e.Jacobian); },
-            (jacobian, residuals, lambda) => SolveSparseNormalEquations((SparseMatrix)jacobian, residuals, lambda),
+            p => { var e = residualFn(p); return (e.Residuals, (object)e.Jacobian); },
             (jacobian, residuals) => ((SparseMatrix)jacobian).ComputeJtr(residuals),
+            (jacobian, residuals, jtr) => PrepareSparseNormal((SparseMatrix)jacobian, jtr),
+            SolveSparseNormalPcg,
             jacobian => { var j = (SparseMatrix)jacobian; return $", nnz={j.NonZeroCount}, sparsity={j.Sparsity:P1}"; },
             options);
     }
@@ -185,9 +189,10 @@ public static partial class NonlinearLeastSquaresSolver
     {
         return SolveCore(
             initialParams,
-            p => { var e = residualFn(p); return (e.Residuals, e.Jacobian); },
-            (jacobian, residuals, lambda) => SolveSparseNormalEquationsDirect((SparseMatrix)jacobian, residuals, lambda),
+            p => { var e = residualFn(p); return (e.Residuals, (object)e.Jacobian); },
             (jacobian, residuals) => ((SparseMatrix)jacobian).ComputeJtr(residuals),
+            (jacobian, residuals, jtr) => PrepareSparseNormal((SparseMatrix)jacobian, jtr),
+            SolveSparseNormalDirect,
             jacobian => { var j = (SparseMatrix)jacobian; return $", nnz={j.NonZeroCount}, sparsity={j.Sparsity:P1}"; },
             options);
     }
@@ -195,8 +200,9 @@ public static partial class NonlinearLeastSquaresSolver
     private static LeastSquaresResult SolveCore(
         double[] initialParams,
         Func<double[], (double[] Residuals, object Jacobian)> evaluate,
-        Func<object, double[], double, double[]> solveNormal,
         Func<object, double[], double[]> computeGradient,
+        Func<object, double[], double[], object> prepareNormal,
+        Func<object, double, double[]> solvePrepared,
         Func<object, string>? extraLogInfo,
         LeastSquaresOptions? options)
     {
@@ -220,6 +226,9 @@ public static partial class NonlinearLeastSquaresSolver
             var (residuals, jacobian) = evaluate(parameters);
             double cost = ComputeCost(residuals);
 
+            // Gradient (Jᵀr) is cheap and drives the convergence checks; compute it first so a
+            // converging iteration can bail out *before* paying for the expensive normal-equations
+            // build below.
             var Jtr = computeGradient(jacobian, residuals);
             double gradientNorm = Math.Sqrt(ComputeSumOfSquares(Jtr));
 
@@ -242,6 +251,11 @@ public static partial class NonlinearLeastSquaresSolver
                 return CreateResult(true, iter, cost, "Cost below threshold", startTime);
             }
 
+            // Only now (we will actually take a step) build the normal equations (JᵀJ, reusing
+            // the Jᵀr just computed). These are invariant across the inner damping loop — only λ
+            // changes — so they are built once here and reused on every rejection/re-solve.
+            var prepared = prepareNormal(jacobian, residuals, Jtr);
+
             double[]? delta;
             bool accepted = false;
             int innerIterations = 0;
@@ -250,7 +264,7 @@ public static partial class NonlinearLeastSquaresSolver
             {
                 try
                 {
-                    delta = solveNormal(jacobian, residuals, options.AdaptiveDamping ? lambda : 0);
+                    delta = solvePrepared(prepared, options.AdaptiveDamping ? lambda : 0);
                 }
                 catch (Exception e)
                 {
@@ -352,65 +366,71 @@ public static partial class NonlinearLeastSquaresSolver
         return sum;
     }
 
-    private static double[] SolveNormalEquations(double[,] J, double[] r, double lambda, bool useQR)
+    // --- Prepared normal equations ------------------------------------------------
+    // The normal equations (JᵀJ, Jᵀr) depend only on the current Jacobian and residual,
+    // not on the LM damping λ. We build them once per outer iteration (Prepare*) and the
+    // inner damping loop only re-applies λ and re-factorizes (Solve*). This avoids
+    // recomputing JᵀJ (dense O(mn²); sparse triplet build + sort) on every step rejection,
+    // and computes Jᵀr a single time (it also yields the gradient norm).
+
+    /// <summary>Reusable dense normal equations for the Cholesky path (or raw J for QR).</summary>
+    private sealed class DenseNormalEquations
     {
-        int m = J.GetLength(0);
-        int n = J.GetLength(1);
+        public readonly bool UseQR;
 
-        if (useQR)
+        // Cholesky path: JᵀJ (mutated on the diagonal per solve), its original diagonal, and -Jᵀr.
+        public readonly double[,]? JtJ;
+        public readonly double[]? OrigDiag;
+        public readonly double[]? NegJtr;
+
+        // QR path: the augmented system is λ-dependent and cannot be cached, so keep J and r.
+        public readonly double[,]? J;
+        public readonly double[]? Residuals;
+
+        public DenseNormalEquations(double[,] jtj, double[] origDiag, double[] negJtr)
         {
-            if (lambda > 0)
-            {
-                // Augment system for regularization
-                var augmentedJ = new double[m + n, n];
-                for (int i = 0; i < m; i++)
-                {
-                    for (int j = 0; j < n; j++)
-                    {
-                        augmentedJ[i, j] = J[i, j];
-                    }
-                }
-                double sqrtLambda = Math.Sqrt(lambda);
-                for (int i = 0; i < n; i++)
-                {
-                    augmentedJ[m + i, i] = sqrtLambda;
-                }
-
-                var augmentedR = new double[m + n];
-                for (int i = 0; i < m; i++)
-                {
-                    augmentedR[i] = -r[i];
-                }
-                // Rest are zeros
-
-                return LinearSolver.QrSolve(augmentedJ, augmentedR);
-            }
-            else
-            {
-                var negR = new double[m];
-                for (int i = 0; i < m; i++)
-                {
-                    negR[i] = -r[i];
-                }
-                return LinearSolver.QrSolve(J, negR);
-            }
+            UseQR = false; JtJ = jtj; OrigDiag = origDiag; NegJtr = negJtr;
         }
 
+        public DenseNormalEquations(double[,] j, double[] residuals, bool _)
+        {
+            UseQR = true; J = j; Residuals = residuals;
+        }
+    }
+
+    private static object PrepareDenseNormal(double[,] J, double[] r, double[] Jtr, bool useQR)
+    {
+        if (useQR)
+            return new DenseNormalEquations(J, r, true);
+
+        int n = J.GetLength(1);
         var JtJ = LinearSolver.ComputeJtJ(J);
-        var Jtr = LinearSolver.ComputeJtr(J, r);
+        var origDiag = new double[n];
         var negJtr = new double[n];
         for (int i = 0; i < n; i++)
         {
+            origDiag[i] = JtJ[i, i];
             negJtr[i] = -Jtr[i];
         }
+        return new DenseNormalEquations(JtJ, origDiag, negJtr);
+    }
 
-        if (lambda > 0)
-        {
-            for (int i = 0; i < n; i++)
-            {
-                JtJ[i, i] += lambda;
-            }
-        }
+    private static double[] SolveDenseNormal(object prepared, double lambda)
+    {
+        var ne = (DenseNormalEquations)prepared;
+
+        if (ne.UseQR)
+            return SolveDenseQr(ne.J!, ne.Residuals!, lambda);
+
+        var JtJ = ne.JtJ!;
+        var origDiag = ne.OrigDiag!;
+        var negJtr = ne.NegJtr!;
+        int n = origDiag.Length;
+
+        // Restore the diagonal and re-apply the current damping (λ >= 0). CholeskySolve
+        // reads JtJ and allocates a fresh L; it does not mutate JtJ off-diagonal or negJtr,
+        // so both are safe to reuse across inner iterations.
+        for (int i = 0; i < n; i++) JtJ[i, i] = origDiag[i] + lambda;
 
         try
         {
@@ -420,50 +440,91 @@ public static partial class NonlinearLeastSquaresSolver
         {
             if (lambda == 0)
             {
-                double fallbackLambda = 1e-6;
-                for (int i = 0; i < n; i++)
-                {
-                    JtJ[i, i] += fallbackLambda;
-                }
+                for (int i = 0; i < n; i++) JtJ[i, i] = origDiag[i] + 1e-6;
                 return LinearSolver.CholeskySolve(JtJ, negJtr);
             }
             throw;
         }
     }
 
-    private static double[] SolveSparseNormalEquations(SparseMatrix J, double[] r, double lambda)
+    private static double[] SolveDenseQr(double[,] J, double[] r, double lambda)
     {
-        int n = J.Cols;
-
-        var JtJ = J.ComputeJtJ();
+        int m = J.GetLength(0);
+        int n = J.GetLength(1);
 
         if (lambda > 0)
         {
-            JtJ = JtJ.AddDiagonal(lambda);
-        }
+            // Augment system for regularization
+            var augmentedJ = new double[m + n, n];
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    augmentedJ[i, j] = J[i, j];
+                }
+            }
+            double sqrtLambda = Math.Sqrt(lambda);
+            for (int i = 0; i < n; i++)
+            {
+                augmentedJ[m + i, i] = sqrtLambda;
+            }
 
-        var Jtr = J.ComputeJtr(r);
-        var negJtr = new double[n];
-        for (int i = 0; i < n; i++)
+            var augmentedR = new double[m + n];
+            for (int i = 0; i < m; i++)
+            {
+                augmentedR[i] = -r[i];
+            }
+            // Rest are zeros
+
+            return LinearSolver.QrSolve(augmentedJ, augmentedR);
+        }
+        else
         {
-            negJtr[i] = -Jtr[i];
+            var negR = new double[m];
+            for (int i = 0; i < m; i++)
+            {
+                negR[i] = -r[i];
+            }
+            return LinearSolver.QrSolve(J, negR);
         }
-
-        return SparseLinearSolver.PreconditionedConjugateGradient(JtJ, negJtr);
     }
 
-    private static double[] SolveSparseNormalEquationsDirect(SparseMatrix J, double[] r, double lambda)
+    /// <summary>Reusable sparse normal equations: JᵀJ (built once) and -Jᵀr.</summary>
+    private sealed class SparseNormalEquations
     {
-        int n = J.Cols;
+        public readonly SparseMatrix JtJ;
+        public readonly double[] NegJtr;
 
+        public SparseNormalEquations(SparseMatrix jtj, double[] negJtr)
+        {
+            JtJ = jtj; NegJtr = negJtr;
+        }
+    }
+
+    private static object PrepareSparseNormal(SparseMatrix J, double[] Jtr)
+    {
         var JtJ = J.ComputeJtJ();
-        if (lambda > 0) JtJ = JtJ.AddDiagonal(lambda);
-
-        var Jtr = J.ComputeJtr(r);
+        int n = J.Cols;
         var negJtr = new double[n];
         for (int i = 0; i < n; i++) negJtr[i] = -Jtr[i];
 
-        return SparseLinearSolver.SparseCholeskyDirect(JtJ, negJtr);
+        return new SparseNormalEquations(JtJ, negJtr);
+    }
+
+    private static double[] SolveSparseNormalPcg(object prepared, double lambda)
+    {
+        var ne = (SparseNormalEquations)prepared;
+        // AddDiagonal returns a new matrix (fast path clones only Values), leaving the cached
+        // JᵀJ untouched so it can be re-damped on the next inner iteration.
+        var A = lambda > 0 ? ne.JtJ.AddDiagonal(lambda) : ne.JtJ;
+        return SparseLinearSolver.PreconditionedConjugateGradient(A, ne.NegJtr);
+    }
+
+    private static double[] SolveSparseNormalDirect(object prepared, double lambda)
+    {
+        var ne = (SparseNormalEquations)prepared;
+        var A = lambda > 0 ? ne.JtJ.AddDiagonal(lambda) : ne.JtJ;
+        return SparseLinearSolver.SparseCholeskyDirect(A, ne.NegJtr);
     }
 
     private static double LineSearch(
